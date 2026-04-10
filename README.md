@@ -326,6 +326,57 @@ tmux attach -t llama
 
 ---
 
+## Multi-Device Deployment
+
+### Hardware Profile
+
+Das System unterstützt verschiedene Hardware-Konfigurationen über Profile:
+
+```bash
+# Server mit Profil starten
+./scripts/start-with-profile.sh rtx-4070-laptop
+```
+
+| Profil | VRAM | RAM | Optimal für |
+|--------|------|-----|-------------|
+| `rtx-4070-laptop` | 8 GB | 30 GB | Qwen3.5-35B MoE |
+| `rtx-4090-desktop` | 24 GB | 64 GB | 405B Modelle |
+| `cpu-only` | 0 GB | 32 GB | 13B Modelle |
+| `mac-m3-max` | 128 GB | 128 GB | Apple Silicon |
+
+### Neues Profil erstellen
+
+```bash
+cp config/profiles/rtx-4070-laptop.sh config/profiles/dein-profil.sh
+# Bearbeite die Werte und starte mit:
+./scripts/start-with-profile.sh dein-profil
+```
+
+---
+
+## Performance-Optimierung
+
+### Optimierte Server-Parameter
+
+```bash
+./scripts/start-server-optimized.sh
+```
+
+| Parameter | Standard | Optimiert | Effekt |
+|-----------|----------|-----------|--------|
+| `--n-cpu-moe` | 36 | 24 | ~1.5 GB mehr VRAM |
+| `-t` | 6 | 10 | Besseres MoE-Routing |
+| `-b` | 8192 | 16384 | Mehr GPU-Offload |
+| `--cache-type-k` | q4_0 | q8_0 | Höhere Qualität |
+
+### GPU-Beschleunigung für Datenverarbeitung
+
+```bash
+pip install cupy-cuda12x faiss-gpu-cu12
+```
+
+---
+
 ## Troubleshooting
 
 ### Modell lädt nicht
