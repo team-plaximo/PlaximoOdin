@@ -21,9 +21,19 @@
   "memory": {
     "ram_gb": 30,
     "swap_gb": 8,
-    "nvme_size_gb": 953.9
+    "nvme_size_gb": 953.9,
+    "ram_usage_percent": 72.7,
+    "ram_used_gb": 23
   },
   "llm_stack": {
+    "model": {
+      "name": "Qwen3.5-35B-A3B",
+      "type": "MoE (Mixture of Experts)",
+      "effective_params": "27B (A3B = 3 Bits Active)",
+      "quantization": "Q4_K_M",
+      "path": "/home/plaximo/unsloth/Qwen3.5-35B-A3B-GGUF/Qwen3.5-35B-A3B-Q4_K_M.gguf",
+      "source": "unsloth"
+    },
     "llama_cpp": {
       "path": "/home/plaximo/llama.cpp",
       "build_path": "/home/plaximo/llama.cpp/build",
@@ -34,28 +44,36 @@
         "llama-mtmd-cli"
       ]
     },
+    "server_config": {
+      "gpu_layers": 99,
+      "cpu_moe_layers": 36,
+      "context_size": 32768,
+      "threads": 6,
+      "batch_size": 8192,
+      "ubatch_size": 512,
+      "parallel": 1,
+      "flash_attention": true,
+      "mlock": true,
+      "jinja": true,
+      "cache_type_k": "q4_0",
+      "cache_type_v": "q4_0"
+    },
     "python": {
       "venv_path": "/home/plaximo/llm-venv",
       "version": "3.12",
       "packages": [
-        "huggingface_hub==1.10.1",
-        "httpx==0.28.1",
-        "typer==0.24.1",
-        "rich==14.3.3",
-        "tqdm==4.67.3"
+        "huggingface_hub",
+        "httpx",
+        "typer",
+        "rich",
+        "tqdm"
       ]
-    },
-    "opencode": {
-      "path": "/home/plaximo/.opencode",
-      "version": "1.4.3"
     }
   },
-  "active_processes": {
-    "llama_server": {
-      "vram_mb": 4744,
-      "gpu_id": 0,
-      "pid": 19547
-    }
+  "resources": {
+    "gpu_vram_used_mb": 4744,
+    "ram_used_gb": 23,
+    "server_pid": 19547
   },
   "storage_usage": {
     "root_partition": {
@@ -65,5 +83,5 @@
       "percent": 62
     }
   },
-  "timestamp": "2026-04-10T15:44:18Z"
+  "timestamp": "2026-04-10T16:39:00Z"
 }

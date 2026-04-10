@@ -22,17 +22,36 @@
 - **Model:** NVIDIA GeForce RTX 4070 Mobile (Laptop)
 - **VRAM:** 8 GB
 - **Driver:** 580.126.09
-- **CUDA Version:** 13.0
-- **Aktueller VRAM-Verbrauch:** ~4.7 GB (llama-server)
+- **CUDA Version:** 13.0 / 12.0 Compiler
 
 ### Speicher
 - **RAM:** 30 GB
-- **Aktuell genutzt:** ~10 GB
+- **Aktuell genutzt:** ~23 GB (72.7%) - für MoE Modell
 - **Swap:** 8 GB
 
 ### Storage
 - **System:** NVMe SSD 953.9 GB
 - **Root-Partition:** 80 GB (46 GB belegt, 62%)
+
+## Aktives Modell
+
+| Eigenschaft | Wert |
+|-------------|------|
+| **Name** | Qwen3.5-35B-A3B |
+| **Typ** | MoE (Mixture of Experts) |
+| **Effektive Parameter** | 27B (A3B = 3 Bits Active) |
+| **Quantisierung** | Q4_K_M |
+| **Kontext-Fenster** | 32.768 Token |
+| **Quelle** | Unsloth |
+
+### MoE-Konfiguration
+
+Das Modell nutzt **CPU für MoE-Layer** (`--n-cpu-moe 36`), um den 35B-MoE effizient auf der Hardware zu betreiben:
+
+- **GPU Layer:** 99 (alle)
+- **CPU MoE Layer:** 36
+- **Threads:** 6
+- **Batch Size:** 8192
 
 ## Software-Stack
 
@@ -43,8 +62,8 @@
 | **llama.cpp** | latest (git) | Lokale Inferenz-Engine |
 | **llama-cli** | b3079 | Kommandozeilen-Inferenz |
 | **llama-server** | b3079 | REST API Server |
-| **huggingface_hub** | 1.10.1 | Modell-Download |
-| **httpx** | 0.28.1 | Async HTTP |
+| **huggingface_hub** | latest | Modell-Download |
+| **httpx** | latest | Async HTTP |
 
 ### Build-Toolchain
 
@@ -79,15 +98,54 @@
 │       ├── huggingface-cli
 │       └── hf
 │
-├── unsloth/                # Unsloth (Qwen3.5-35B-A3B)
+├── unsloth/                # Unsloth Modelle
 │   └── Qwen3.5-35B-A3B-GGUF/
+│       └── Qwen3.5-35B-A3B-Q4_K_M.gguf
 │
 ├── .config/
 │   └── opencode/           # OpenCode AI Config
 │
 └── .cache/
-    └── huggingface/        # HuggingFace Model Cache (22 MB)
+    └── huggingface/        # HuggingFace Model Cache
 ```
+
+## Server-Konfiguration
+
+### Aktuelle Konfiguration
+
+```bash
+~/llama.cpp/llama-server \
+  -m ~/unsloth/Qwen3.5-35B-A3B-GGUF/Qwen3.5-35B-A3B-Q4_K_M.gguf \
+  -ngl 99 \
+  --n-cpu-moe 36 \
+  -c 32768 \
+  -t 6 \
+  -tb 6 \
+  -b 8192 \
+  -ub 512 \
+  --cache-type-k q4_0 \
+  --cache-type-v q4_0 \
+  --parallel 1 \
+  --flash-attn \
+  --mlock \
+  --jinja \
+  --host 0.0.0.0 \
+  --port 8080
+```
+
+### Parameter-Erklärung
+
+| Parameter | Wert | Beschreibung |
+|-----------|------|-------------|
+| `-m` | model.gguf | Pfad zum Modell |
+| `-ngl 99` | 99 | GPU Layer (99 = alle) |
+| `--n-cpu-moe` | 36 | MoE-Layer auf CPU |
+| `-c` | 32768 | Kontext-Größe |
+| `-t` | 6 | CPU-Threads |
+| `-b` | 8192 | Batch-Größe |
+| `--flash-attn` | on | Flash Attention |
+| `--mlock` | on | RAM nicht auslagern |
+| `--cache-type-k/v` | q4_0 | KV-Cache Quantisierung |
 
 ## Installation & Setup
 
@@ -96,58 +154,36 @@
 ```bash
 cd ~/llama.cpp
 mkdir build && cd build
-cmake ..
+cmake .. -DGGML_CUDA=ON
 make -j$(nproc)
 ```
 
-### Modelle herunterladen
+### Modell herunterladen (Unsloth)
 
 ```bash
-# Via HuggingFace CLI
 source ~/llm-venv/bin/activate
-huggingface-cli download <model_id>
-
-# Direkt mit llama-cli
-./llama-cli -hf <model_id>
+HF_HUB_ENABLE_HF_TRANSFER=1 hf download unsloth/Qwen3.5-35B-A3B-GGUF \
+  --local-dir ~/unsloth/Qwen3.5-35B-A3B-GGUF \
+  --include "*Q4_K_M*"
 ```
 
 ### Server starten
 
 ```bash
-cd ~/llama.cpp
-./build/bin/llama-server \
-  -m pfad/zu/model.gguf \
-  -c 4096 \
-  -ngl 99 \
-  --host 0.0.0.0 \
-  --port 8080
-```
-
-## Konfiguration
-
-### Environment Variables
-
-```bash
-# In ~/.bashrc
-export PATH=$HOME/.opencode/bin:$PATH
-```
-
-### Aliases
-
-```bash
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
+tmux new -s llama
+~/llama.cpp/llama-server \
+  -m ~/unsloth/Qwen3.5-35B-A3B-GGUF/Qwen3.5-35B-A3B-Q4_K_M.gguf \
+  -ngl 99 --n-cpu-moe 36 -c 32768 -t 6 \
+  --flash-attn --mlock --jinja \
+  --host 0.0.0.0 --port 8080
 ```
 
 ## Aktive Services
 
-- **llama-server** - Läuft mit ~4.7 GB VRAM auf GPU 0
-- **GNOME Session** - Vollständige Desktop-Umgebung
-
-## Installation Scripts
-
-Siehe `/scripts/` für automatisierte Setup-Skripte.
+| Service | VRAM | RAM | Status |
+|---------|------|-----|--------|
+| llama-server | 4.7 GB | 23 GB | ✅ Aktiv (PID 19547) |
+| Xorg | 4 MB | - | ✅ Aktiv |
 
 ## Maintenance
 
@@ -159,25 +195,26 @@ sudo apt update && sudo apt upgrade
 
 # llama.cpp
 cd ~/llama.cpp && git pull && cd build && cmake .. && make -j$(nproc)
-
-# Python packages
-source ~/llm-venv/bin/activate && pip install -U package
 ```
 
 ### Monitoring
 
 ```bash
 # GPU Status
-nvidia-smi
+nvidia-smi -l 1
 
 # Speicher
-free -h
+watch -n 1 free -h
 
-# llama-server Logs
-# Via http://localhost:8080
+# Prozesse
+ps aux | grep llama
 ```
 
 ## Troubleshooting
+
+### Modell lädt nicht
+- Prüfe ob genug RAM verfügbar (`free -h`)
+- MoE-Layer anpassen: `--n-cpu-moe 50` oder `--n-cpu-moe 70`
 
 ### CUDA nicht gefunden
 ```bash
@@ -185,13 +222,16 @@ export CUDA_PATH=/usr/local/cuda
 export PATH=$CUDA_PATH/bin:$PATH
 ```
 
-### Modell zu groß für VRAM
+### Performance optimieren
 ```bash
-# Mit weniger GPU-Layer
-./llama-server -m model.gguf -ngl 33
+# Mehr CPU für MoE
+--n-cpu-moe 70
 
-# Oder CPU-only
-./llama-server -m model.gguf -ngl 0
+# Größerer Kontext
+-c 65536
+
+# Mehr KV-Cache
+--cache-type-k q8_0 --cache-type-v q8_0
 ```
 
 ---
