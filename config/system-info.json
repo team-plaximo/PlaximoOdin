@@ -1,0 +1,69 @@
+{
+  "system": {
+    "os": "Ubuntu 24.04.4 LTS",
+    "kernel": "6.17.0-20-generic",
+    "hostname": "plaximo-Victus",
+    "username": "plaximo",
+    "architecture": "x86_64"
+  },
+  "cpu": {
+    "model": "AMD Ryzen 7 7840HS w/ Radeon 780M Graphics",
+    "cores": 16,
+    "threads": 16
+  },
+  "gpu": {
+    "model": "NVIDIA GeForce RTX 4070 Mobile",
+    "vram_mb": 8188,
+    "driver": "580.126.09",
+    "cuda_version": "13.0",
+    "cuda_compiler": "12.0.140"
+  },
+  "memory": {
+    "ram_gb": 30,
+    "swap_gb": 8,
+    "nvme_size_gb": 953.9
+  },
+  "llm_stack": {
+    "llama_cpp": {
+      "path": "/home/plaximo/llama.cpp",
+      "build_path": "/home/plaximo/llama.cpp/build",
+      "binaries": [
+        "llama-cli",
+        "llama-server",
+        "llama-gguf-split",
+        "llama-mtmd-cli"
+      ]
+    },
+    "python": {
+      "venv_path": "/home/plaximo/llm-venv",
+      "version": "3.12",
+      "packages": [
+        "huggingface_hub==1.10.1",
+        "httpx==0.28.1",
+        "typer==0.24.1",
+        "rich==14.3.3",
+        "tqdm==4.67.3"
+      ]
+    },
+    "opencode": {
+      "path": "/home/plaximo/.opencode",
+      "version": "1.4.3"
+    }
+  },
+  "active_processes": {
+    "llama_server": {
+      "vram_mb": 4744,
+      "gpu_id": 0,
+      "pid": 19547
+    }
+  },
+  "storage_usage": {
+    "root_partition": {
+      "total_gb": 80,
+      "used_gb": 46,
+      "free_gb": 29,
+      "percent": 62
+    }
+  },
+  "timestamp": "2026-04-10T15:44:18Z"
+}
