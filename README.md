@@ -72,6 +72,39 @@
 
 ---
 
+## Netzwerk Access Points
+
+### Server-URL
+```
+http://192.168.10.2:8080
+```
+
+### Endpoints
+
+| Methode | Endpoint | Beschreibung |
+|---------|----------|--------------|
+| GET | `/v1/models` | Modelle auflisten |
+| POST | `/v1/chat/completions` | Chat |
+| POST | `/v1/completions` | Text-Generierung |
+| POST | `/v1/embeddings` | Embeddings |
+| GET | `/health` | Server-Status |
+
+### Clients
+
+Siehe `/clients/`:
+- `chat-cli.py` - Einfacher Chat-Client
+- `plaximo_client.py` - Python Library
+- `opencode-remote.json` - OpenCode Konfiguration
+
+### Quick Chat (cURL)
+```bash
+curl -X POST http://192.168.10.2:8080/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"Hallo!"}]}'
+```
+
+---
+
 ## Aktives Modell
 
 | Eigenschaft | Wert |
