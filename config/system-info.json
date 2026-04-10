@@ -4,51 +4,100 @@
     "kernel": "6.17.0-20-generic",
     "hostname": "plaximo-Victus",
     "username": "plaximo",
-    "architecture": "x86_64"
+    "architecture": "x86_64",
+    "uptime_hours": 21,
+    "locale": "de_DE.UTF-8",
+    "timezone": "Europe/Berlin"
   },
   "cpu": {
     "model": "AMD Ryzen 7 7840HS w/ Radeon 780M Graphics",
     "cores": 16,
-    "threads": 16
+    "threads": 16,
+    "threads_per_core": 2,
+    "scaling_percent": 61
   },
   "gpu": {
-    "model": "NVIDIA GeForce RTX 4070 Mobile",
-    "vram_mb": 8188,
+    "model": "NVIDIA GeForce RTX 4070 Laptop GPU",
+    "vram_total_mib": 8188,
+    "vram_free_mib": 3040,
+    "vram_used_mib": 4767,
     "driver": "580.126.09",
+    "driver_type": "Open Kernel Module",
     "cuda_version": "13.0",
-    "cuda_compiler": "12.0.140"
+    "cuda_compiler": "12.0.140",
+    "compute_capability": "8.9",
+    "temperature_c": 45,
+    "gpu_util_percent": 0
   },
   "memory": {
-    "ram_gb": 30,
-    "swap_gb": 8,
-    "nvme_size_gb": 953.9,
-    "ram_usage_percent": 72.7,
-    "ram_used_gb": 23
+    "ram_total_gib": 30,
+    "ram_used_gib": 11,
+    "ram_free_gib": 0.554,
+    "ram_available_gib": 19,
+    "swap_total_gib": 8,
+    "swap_used_gib": 0.0004
+  },
+  "storage": {
+    "type": "NVMe SSD",
+    "total_gb": 953.9,
+    "root_total_gb": 79,
+    "root_used_gb": 46,
+    "root_free_gb": 29,
+    "root_percent": 62
+  },
+  "network": {
+    "interfaces": {
+      "eno1": {
+        "type": "ethernet",
+        "ip": "192.168.10.2/24"
+      },
+      "wlo1": {
+        "type": "wifi",
+        "ip": "192.168.179.15/24",
+        "default_route": true
+      },
+      "lo": {
+        "type": "loopback",
+        "ip": "127.0.0.1/8"
+      }
+    }
   },
   "llm_stack": {
     "model": {
       "name": "Qwen3.5-35B-A3B",
       "type": "MoE (Mixture of Experts)",
-      "effective_params": "27B (A3B = 3 Bits Active)",
+      "total_parameters": "35B",
+      "active_parameters": "27B",
+      "experts": 8,
+      "experts_per_token": 2,
       "quantization": "Q4_K_M",
+      "file_size_gb": 21,
+      "original_size_gb": 70,
+      "context_train": 262144,
+      "context_active": 32768,
+      "embedding_dim": 2048,
+      "vocab_size": 248320,
       "path": "/home/plaximo/unsloth/Qwen3.5-35B-A3B-GGUF/Qwen3.5-35B-A3B-Q4_K_M.gguf",
       "source": "unsloth"
     },
     "llama_cpp": {
+      "version": "b8738",
+      "commit": "d6f303004",
       "path": "/home/plaximo/llama.cpp",
       "build_path": "/home/plaximo/llama.cpp/build",
-      "binaries": [
-        "llama-cli",
-        "llama-server",
-        "llama-gguf-split",
-        "llama-mtmd-cli"
-      ]
+      "binaries": {
+        "llama-cli": "CLI Inferenz",
+        "llama-server": "HTTP API Server",
+        "llama-gguf-split": "Model Splitter",
+        "llama-mtmd-cli": "Multi-Modal Support"
+      }
     },
     "server_config": {
       "gpu_layers": 99,
       "cpu_moe_layers": 36,
       "context_size": 32768,
       "threads": 6,
+      "thread_batch": 6,
       "batch_size": 8192,
       "ubatch_size": 512,
       "parallel": 1,
@@ -56,32 +105,59 @@
       "mlock": true,
       "jinja": true,
       "cache_type_k": "q4_0",
-      "cache_type_v": "q4_0"
+      "cache_type_v": "q4_0",
+      "host": "0.0.0.0",
+      "port": 8080
     },
     "python": {
-      "venv_path": "/home/plaximo/llm-venv",
-      "version": "3.12",
-      "packages": [
-        "huggingface_hub",
-        "httpx",
-        "typer",
-        "rich",
-        "tqdm"
-      ]
+      "venv_path": "/home/plamximo/llm-venv",
+      "python_version": "3.12.3",
+      "packages": {
+        "huggingface_hub": "1.10.1",
+        "httpx": "0.28.1",
+        "typer": "0.24.1",
+        "rich": "14.3.3",
+        "tqdm": "4.67.3",
+        "PyYAML": "6.0.3",
+        "anyio": "4.13.0",
+        "click": "8.3.2",
+        "filelock": "3.25.2",
+        "hf_transfer": "0.1.9",
+        "hf-xet": "1.4.3"
+      }
     }
   },
-  "resources": {
-    "gpu_vram_used_mb": 4744,
-    "ram_used_gb": 23,
-    "server_pid": 19547
-  },
-  "storage_usage": {
-    "root_partition": {
-      "total_gb": 80,
-      "used_gb": 46,
-      "free_gb": 29,
-      "percent": 62
+  "tools": {
+    "github_cli": {
+      "version": "2.89.0",
+      "auth_status": "logged_in",
+      "account": "team-plaximo",
+      "protocol": "ssh"
+    },
+    "opencode": {
+      "version": "1.4.3",
+      "path": "/home/plaximo/.opencode"
+    },
+    "docker": {
+      "installed": false
+    },
+    "nodejs": {
+      "installed": false
     }
   },
-  "timestamp": "2026-04-10T16:39:00Z"
+  "server_status": {
+    "pid": 19547,
+    "port": 8080,
+    "vram_mib": 4767,
+    "ram_gib": 23,
+    "cpu_percent": 12.1,
+    "tmux_session": "llama",
+    "uptime_hours": 2.75
+  },
+  "repository": {
+    "name": "PlaximoOdin",
+    "url": "https://github.com/team-plaximo/PlaximoOdin",
+    "owner": "team-plaximo"
+  },
+  "timestamp": "2026-04-10T16:46:00+02:00"
 }
