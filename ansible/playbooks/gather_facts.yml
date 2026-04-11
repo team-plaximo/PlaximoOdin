@@ -1,0 +1,27 @@
+---
+- name: Gather system facts
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  tasks:
+    - name: Save OS facts
+      copy:
+        content: |
+          OS: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}
+          Kernel: {{ ansible_facts['kernel'] }}
+          Architecture: {{ ansible_facts['architecture'] }}
+          Hostname: {{ ansible_facts['hostname'] }}
+          Python: {{ ansible_facts['python_version'] }}
+        dest: /home/plaximo/.ansible/facts/system_info.txt
+        mode: '0644'
+
+    - name: Create facts directory
+      file:
+        path: /home/plaximo/.ansible/facts
+        state: directory
+
+    - name: Save all facts to JSON
+      copy:
+        content: "{{ ansible_facts | to_nice_json }}"
+        dest: /home/plaximo/.ansible/facts/all_facts.json
+        mode: '0644'

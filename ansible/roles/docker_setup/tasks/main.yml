@@ -1,0 +1,22 @@
+---
+# Docker Setup Role
+- name: Configure Docker
+  block:
+    - name: Ensure Docker is installed
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - docker-compose
+        state: present
+
+    - name: Ensure Docker service is running
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add plaximo user to docker group
+      ansible.builtin.user:
+        name: plaximo
+        groups: docker
+        append: yes

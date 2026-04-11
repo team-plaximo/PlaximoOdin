@@ -1,0 +1,5 @@
+OS: Ubuntu 24.04
+Kernel: 6.17.0-20-generic
+Architecture: x86_64
+Hostname: plaximo-Victus
+Python: 3.12.3
