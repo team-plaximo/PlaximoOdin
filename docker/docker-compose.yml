@@ -1,0 +1,41 @@
+# PlaximoOdin - Docker Compose
+# Usage: docker compose up -d
+
+services:
+  llama-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: plaximo/llama-server:latest
+    container_name: plaximo-llama
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./models:/models:ro
+    environment:
+      - MODEL=/models/Qwen3.5-35B-A3B-Q4_K_M.gguf
+      - GPU_LAYERS=99
+      - CPU_MOE=36
+      - CONTEXT_SIZE=32768
+      - THREADS=6
+      - BATCH_SIZE=8192
+      - PARALLEL=2
+      - PORT=8080
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+networks:
+  default:
+    name: plaximo-network

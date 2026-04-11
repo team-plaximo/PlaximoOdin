@@ -1,0 +1,32 @@
+# PlaximoOdin - Server Configuration Template
+# Kopieren nach: ~/.config/plaximo/server.conf
+
+# ===== Modell =====
+MODEL_PATH=~/unsloth/Qwen3.5-35B-A3B-GGUF/Qwen3.5-35B-A3B-Q4_K_M.gguf
+MODEL_NAME=Qwen3.5-35B-A3B
+
+# ===== Server =====
+PORT=8080
+HOST=0.0.0.0
+
+# ===== Performance =====
+GPU_LAYERS=99
+CPU_MOE=36
+CONTEXT_SIZE=32768
+THREADS=6
+BATCH_SIZE=8192
+UBATCH_SIZE=512
+PARALLEL=2
+
+# ===== KV-Cache =====
+CACHE_TYPE_K=q4_0
+CACHE_TYPE_V=q4_0
+
+# ===== Features =====
+FLASH_ATTENTION=1
+MLOCK=1
+JINJA=1
+
+# ===== Monitoring =====
+HEALTH_CHECK_INTERVAL=30
+METRICS_PORT=9090

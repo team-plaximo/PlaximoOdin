@@ -1,0 +1,101 @@
+# PlaximoOdin - Ansible Playbook
+# Usage: ansible-playbook -i inventory.yml playbook.yml
+
+---
+- name: Setup PlaximoOdin LLM Server
+  hosts: all
+  become: true
+  vars:
+    llama_version: latest
+    model_url: "https://huggingface.co/unsloth/Qwen3.5-35B-A3B-GGUF"
+    model_file: "Qwen3.5-35B-A3B-Q4_K_M.gguf"
+    
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+
+    - name: Install system packages
+      apt:
+        pkg:
+          - git
+          - build-essential
+          - cmake
+          - python3
+          - python3-pip
+          - python3-venv
+          - curl
+          - wget
+          - htop
+          - tmux
+      when: ansible_os_family == "Debian"
+
+    - name: Create plaximo user directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - /home/plaximo/llama.cpp
+        - /home/plaximo/unsloth
+        - /home/plaximo/llm-venv
+
+    - name: Clone llama.cpp
+      git:
+        repo: https://github.com/ggerganov/llama.cpp.git
+        dest: /home/plaximo/llama.cpp
+        version: master
+        update: yes
+      when: llama_source_install | default(true)
+
+    - name: Build llama.cpp
+      command: |
+        cd /home/plaximo/llama.cpp
+        mkdir -p build && cd build
+        cmake .. -DGGML_CUDA=ON -DCMAKE_BUILD_TYPE=Release
+        make -j$(nproc) llama-server
+      args:
+        creates: /home/plaximo/llama.cpp/build/bin/llama-server
+      when: llama_source_install | default(true)
+
+    - name: Create Python virtual environment
+      python_venv:
+        name: /home/plaximo/llm-venv
+        system_site_packages: no
+
+    - name: Install Python packages
+      pip:
+        name:
+          - huggingface_hub
+          - httpx
+          - typer
+          - rich
+          - tqdm
+        virtualenv: /home/plaximo/llm-venv
+        virtualenv_command: python3 -m venv
+
+    - name: Create systemd service for llama-server
+      template:
+        src: templates/llama-server.service.j2
+        dest: /etc/systemd/system/llama-server.service
+        mode: '0644'
+      when: enable_systemd_service | default(false)
+
+    - name: Enable and start llama-server service
+      systemd:
+        name: llama-server
+        enabled: yes
+        state: started
+      when: enable_systemd_service | default(false)
+
+    - name: Create aliases in bashrc
+      blockinfile:
+        path: /home/plaximo/.bashrc
+        marker: "# {mark} PLAXIMO ODIN"
+        block: |
+          # PlaximoOdin aliases
+          alias llm-start='tmux new-session -d -s llama "~/llama.cpp/build/bin/llama-server -m ~/unsloth/Qwen3.5-35B-A3B-GGUF/Qwen3.5-35B-A3B-Q4_K_M.gguf -ngl 99 --n-cpu-moe 36 -c 32768 -t 6 --flash-attn --mlock --jinja --host 0.0.0.0 --port 8080"'
+          alias llm-status='curl -s http://localhost:8080/v1/models | python3 -m json.tool'
+          alias llm-logs='tmux attach -t llama'

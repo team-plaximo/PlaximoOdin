@@ -1,0 +1,24 @@
+[Unit]
+Description=PlaximoOdin Llama Server
+After=network.target
+
+[Service]
+Type=simple
+User=plaximo
+WorkingDirectory=/home/plaximo
+ExecStart=/home/plaximo/llama.cpp/build/bin/llama-server \
+    -m {{ model_path | default('/home/plaximo/unsloth/Qwen3.5-35B-A3B-GGUF/Qwen3.5-35B-A3B-Q4_K_M.gguf') }} \
+    -ngl {{ gpu_layers | default(99) }} \
+    --n-cpu-moe {{ cpu_moe | default(36) }} \
+    -c {{ context_size | default(32768) }} \
+    -t {{ threads | default(6) }} \
+    --flash-attn \
+    --mlock \
+    --jinja \
+    --host 0.0.0.0 \
+    --port {{ port | default(8080) }}
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

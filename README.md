@@ -451,3 +451,87 @@ nvcc --version
 ---
 
 *Last updated: 2026-04-11 08:30:00 CEST*
+
+---
+
+## Infrastructure as Code (IaC)
+
+### Docker
+
+#### Quick Start
+```bash
+cd docker
+docker build -t plaximo/llama-server .
+docker run -d \
+  --gpus all \
+  -p 8080:8080 \
+  -v /path/to/models:/models \
+  -e MODEL=/models/Qwen3.5-35B-A3B-Q4_K_M.gguf \
+  plaximo/llama-server
+```
+
+#### Mit Docker Compose
+```bash
+cd docker
+docker compose up -d
+```
+
+#### Environment Variablen
+| Variable | Default | Beschreibung |
+|----------|---------|---------------|
+| `MODEL` | `/models/Qwen3.5-35B-A3B-Q4_K_M.gguf` | Modell-Pfad |
+| `GPU_LAYERS` | `99` | GPU-Layer |
+| `CPU_MOE` | `36` | MoE-Layer auf CPU |
+| `CONTEXT_SIZE` | `32768` | Kontext-Größe |
+| `THREADS` | `6` | CPU-Threads |
+| `BATCH_SIZE` | `8192` | Batch-Größe |
+| `PORT` | `8080` | Server-Port |
+
+### Ansible
+
+#### Setup auf neuem Server
+```bash
+cd ansible
+ansible-playbook -i inventory.yml playbook.yml
+```
+
+#### Inventory anpassen
+Bearbeite `inventory.yml` für deine Hardware:
+```yaml
+all:
+  children:
+    rtx-4070-laptop:
+      hosts:
+        my-laptop:
+          ansible_host: 192.168.1.100
+          gpu_vram_mb: 8188
+          ram_gb: 30
+```
+
+### Health Check
+```bash
+./scripts/health-check.sh
+```
+
+### Config Template
+Kopiere `config/server.conf.template` nach `~/.config/plaximo/server.conf` und passe an.
+
+---
+
+## Development Environment
+
+### Dev Container
+```bash
+cd docker/dev
+docker build -t plaximo-dev .
+docker run -it --gpus all plaximo-dev
+```
+
+### Enthält
+- Ubuntu 24.04
+- CUDA Toolkit
+- Python + pip
+- tmux, vim, htop
+- OpenCode
+- Git
+

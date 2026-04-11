@@ -1,0 +1,30 @@
+# Inventory für verschiedene Hardware-Konfigurationen
+
+all:
+  children:
+    plaximo-laptop:
+      hosts:
+        plaximo-victus:
+          ansible_host: 192.168.10.2
+          ansible_user: plaximo
+          gpu_vram_mb: 8188
+          ram_gb: 30
+          profile: rtx-4070-laptop
+    
+    rtx-4090-desktop:
+      hosts:
+        desktop-01:
+          ansible_host: 192.168.10.10
+          ansible_user: developer
+          gpu_vram_mb: 24576
+          ram_gb: 64
+          profile: rtx-4090-desktop
+    
+    cpu-server:
+      hosts:
+        server-01:
+          ansible_host: 192.168.10.20
+          ansible_user: developer
+          gpu_vram_mb: 0
+          ram_gb: 64
+          profile: cpu-only

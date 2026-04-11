@@ -1,0 +1,6 @@
+.git
+.gitignore
+*.md
+llama.cpp
+__pycache__
+*.gguf
