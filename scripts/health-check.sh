@@ -19,7 +19,7 @@ echo ""
 
 # Check 1: Server Response
 echo -n "Server Response... "
-if curl -s -f "$SERVER_URL/health" > /dev/null 2>&1; then
+if curl -s -f "$SERVER_URL/v1/models" > /dev/null 2>&1; then
     echo -e "${GREEN}OK${NC}"
 else
     echo -e "${RED}FAILED${NC}"
