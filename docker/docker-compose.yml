@@ -9,18 +9,21 @@ services:
     image: plaximo/llama-server:latest
     container_name: plaximo-llama
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     volumes:
       - /home/plaximo/llama.cpp/build/bin/llama-server:/usr/local/bin/llama-server:ro
       - /home/plaximo/unsloth:/models:ro
     environment:
       - MODEL=/models/Qwen3.5-35B-A3B-GGUF/Qwen3.5-35B-A3B-Q4_K_M.gguf
       - GPU_LAYERS=99
-      - CPU_MOE=36
-      - CONTEXT_SIZE=32768
-      - THREADS=6
-      - BATCH_SIZE=8192
+      - CPU_MOE=24
+      - CONTEXT_SIZE=16384
+      - THREADS=10
+      - BATCH_SIZE=16384
+      - UBATCH_SIZE=2048
       - PARALLEL=2
+      - CACHE_K=q8_0
+      - CACHE_V=q4_0
       - PORT=8080
     deploy:
       resources:
@@ -29,13 +32,15 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+    security_opt:
+      - no-new-privileges:true
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/v1/models"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 90s
 
 networks:
   default:

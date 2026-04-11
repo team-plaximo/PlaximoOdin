@@ -11,10 +11,10 @@ export RAM_GB=30
 export MODEL_PATH="/home/plaximo/unsloth/Qwen3.5-35B-A3B-GGUF/Qwen3.5-35B-A3B-Q4_K_M.gguf"
 export MODEL_NAME="Qwen3.5-35B-A3B-Q4_K_M"
 
-# Server-Parameter
+# Server-Parameter (balanced: ~18 GB RAM, stabil unter Last)
 export GPU_LAYERS=99
 export CPU_MOE=24
-export CONTEXT_SIZE=32768
+export CONTEXT_SIZE=16384
 export THREADS=10
 export BATCH_THREADS=12
 export BATCH_SIZE=16384
@@ -31,3 +31,4 @@ export MLOCK=1
 export JINJA=1
 
 echo "Profil geladen: $PROFILE_NAME ($GPU_MODEL, $VRAM_MB MB VRAM, $RAM_GB GB RAM)"
+echo "Context: $CONTEXT_SIZE | CPU_MOE: $CPU_MOE | Cache: $CACHE_K/$CACHE_V"

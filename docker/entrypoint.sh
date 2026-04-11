@@ -3,14 +3,17 @@
 
 set -e
 
-# Default values
+# Default values (aligned mit rtx-4070-laptop Profil)
 MODEL=${MODEL:-"/models/Qwen3.5-35B-A3B-Q4_K_M.gguf"}
 GPU_LAYERS=${GPU_LAYERS:-99}
-CPU_MOE=${CPU_MOE:-36}
-CONTEXT_SIZE=${CONTEXT_SIZE:-32768}
-THREADS=${THREADS:-6}
-BATCH_SIZE=${BATCH_SIZE:-8192}
+CPU_MOE=${CPU_MOE:-24}
+CONTEXT_SIZE=${CONTEXT_SIZE:-16384}
+THREADS=${THREADS:-10}
+BATCH_SIZE=${BATCH_SIZE:-16384}
+UBATCH_SIZE=${UBATCH_SIZE:-2048}
 PARALLEL=${PARALLEL:-2}
+CACHE_K=${CACHE_K:-q8_0}
+CACHE_V=${CACHE_V:-q4_0}
 PORT=${PORT:-8080}
 
 echo "=========================================="
@@ -21,7 +24,8 @@ echo "GPU Layers:  $GPU_LAYERS"
 echo "CPU MoE:     $CPU_MOE"
 echo "Context:     $CONTEXT_SIZE"
 echo "Threads:     $THREADS"
-echo "Batch:       $BATCH_SIZE"
+echo "Batch:       $BATCH_SIZE / $UBATCH_SIZE"
+echo "Cache K/V:   $CACHE_K / $CACHE_V"
 echo "Parallel:    $PARALLEL"
 echo "Port:        $PORT"
 echo "=========================================="
@@ -40,8 +44,9 @@ exec llama-server \
     -c "$CONTEXT_SIZE" \
     -t "$THREADS" \
     -b "$BATCH_SIZE" \
-    --cache-type-k q4_0 \
-    --cache-type-v q4_0 \
+    -ub "$UBATCH_SIZE" \
+    --cache-type-k "$CACHE_K" \
+    --cache-type-v "$CACHE_V" \
     --parallel "$PARALLEL" \
     --flash-attn \
     --mlock \
