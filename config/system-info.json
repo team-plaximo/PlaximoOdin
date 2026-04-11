@@ -17,7 +17,7 @@
   "gpu": {
     "model": "NVIDIA GeForce RTX 4070 Laptop GPU",
     "vram_total_mib": 8188,
-    "vram_used_mib": 4939,
+    "vram_used_mib": 4767,
     "driver": "580.126.09",
     "driver_type": "Open Kernel Module",
     "cuda_version": "13.0",
@@ -25,9 +25,9 @@
   },
   "memory": {
     "ram_total_gib": 30,
-    "ram_used_gib": 13,
-    "ram_free_gib": 2.1,
-    "ram_available_gib": 17,
+    "ram_used_gib": 14,
+    "ram_free_gib": 1.9,
+    "ram_available_gib": 16,
     "swap_total_gib": 8,
     "swap_used_gib": 0.0004
   },
@@ -79,5 +79,5 @@
     "name": "PlaximoOdin",
     "url": "https://github.com/team-plaximo/PlaximoOdin"
   },
-  "timestamp": "2026-04-11T08:30:00+02:00"
+  "timestamp": "2026-04-11T12:00:00+02:00"
 }

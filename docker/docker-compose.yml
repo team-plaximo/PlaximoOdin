@@ -11,9 +11,10 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./models:/models:ro
+      - /home/plaximo/llama.cpp/build/bin/llama-server:/usr/local/bin/llama-server:ro
+      - /home/plaximo/unsloth:/models:ro
     environment:
-      - MODEL=/models/Qwen3.5-35B-A3B-Q4_K_M.gguf
+      - MODEL=/models/Qwen3.5-35B-A3B-GGUF/Qwen3.5-35B-A3B-Q4_K_M.gguf
       - GPU_LAYERS=99
       - CPU_MOE=36
       - CONTEXT_SIZE=32768
