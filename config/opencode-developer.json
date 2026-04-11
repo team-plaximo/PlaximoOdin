@@ -1,0 +1,42 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "openai/qwen3.5-35b-a3b",
+  "small_model": "openai/qwen3.5-35b-a3b",
+  "autoupdate": true,
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 15000
+  },
+  "permission": {
+    "bash": "ask",
+    "edit": "ask",
+    "write": "ask"
+  },
+  "provider": {
+    "openai": {
+      "options": {
+        "baseURL": "http://192.168.10.2:8080/v1",
+        "apiKey": "not-required",
+        "timeout": 300000
+      }
+    }
+  },
+  "instructions": [
+    "CONTRIBUTING.md",
+    "CODE_STYLE.md"
+  ],
+  "snapshot": true,
+  "watcher": {
+    "ignore": [
+      "node_modules/**",
+      ".git/**",
+      "dist/**",
+      "build/**",
+      "*.log",
+      "__pycache__/**",
+      ".venv/**",
+      "venv/**"
+    ]
+  }
+}
