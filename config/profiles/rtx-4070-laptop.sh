@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+export MODEL="${MODEL:-/home/plaximo/unsloth/Qwen3.5-35B-A3B-GGUF/UD-Q4_K_XL/Qwen3.5-35B-A3B-UD-Q4_K_XL-00001-of-00002.gguf}"
+export HOST="${HOST:-0.0.0.0}"
+export PORT="${PORT:-8080}"
+export CONTEXT_SIZE="${CONTEXT_SIZE:-16384}"
+export GPU_LAYERS="${GPU_LAYERS:-99}"
+export CPU_MOE="${CPU_MOE:-24}"
+export THREADS="${THREADS:-10}"
+export BATCH_THREADS="${BATCH_THREADS:-12}"
+export BATCH_SIZE="${BATCH_SIZE:-16384}"
+export UBATCH_SIZE="${UBATCH_SIZE:-2048}"
+export PARALLEL="${PARALLEL:-2}"
+export CACHE_K="${CACHE_K:-q8_0}"
+export CACHE_V="${CACHE_V:-q4_0}"
+export FLASH_ATTN="${FLASH_ATTN:-1}"
+export MLOCK="${MLOCK:-1}"
+export JINJA="${JINJA:-1}"

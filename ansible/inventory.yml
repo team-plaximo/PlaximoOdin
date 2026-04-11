@@ -1,0 +1,15 @@
+all:
+  hosts:
+    local-4070:
+      ansible_connection: local
+      ansible_user: plaximo
+      user_home: /home/plaximo
+      profile_name: rtx-4070-laptop
+      gpu_vram_mb: 8192
+      ram_gb: 32
+      llama_cpp_repo: https://github.com/ggml-org/llama.cpp.git
+      llama_cpp_dir: /home/plaximo/llama.cpp
+      llm_venv_dir: /home/plaximo/llm-venv
+      model_dir: /home/plaximo/unsloth
+      service_name: plaximo-odin
+      service_port: 8080

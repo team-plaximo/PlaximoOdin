@@ -1,0 +1,21 @@
+[Unit]
+Description=PlaximoOdin llama.cpp server
+After=network.target
+
+[Service]
+Type=simple
+User={{ ansible_user }}
+Group={{ ansible_user }}
+WorkingDirectory={{ user_home }}
+Environment=HOME={{ user_home }}
+Environment=PROFILE_FILE={{ user_home }}/.config/plaximo-odin/profile.sh
+ExecStart={{ user_home }}/.local/bin/plaximo-odin-start
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

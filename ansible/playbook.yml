@@ -1,0 +1,122 @@
+---
+- name: Provision PlaximoOdin locally
+  hosts: all
+  become: true
+  vars:
+    app_user: "{{ ansible_user }}"
+    app_group: "{{ ansible_user }}"
+    profile_src: "{{ playbook_dir }}/../config/profiles/{{ profile_name }}.sh"
+    profile_dest: "{{ user_home }}/.config/plaximo-odin/profile.sh"
+    start_script_dest: "{{ user_home }}/.local/bin/plaximo-odin-start"
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install system packages
+      apt:
+        name:
+          - build-essential
+          - cmake
+          - git
+          - curl
+          - wget
+          - python3
+          - python3-venv
+          - python3-pip
+          - pkg-config
+        state: present
+
+    - name: Ensure base directories exist
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: "0755"
+      loop:
+        - "{{ user_home }}/.config/plaximo-odin"
+        - "{{ user_home }}/.local/bin"
+        - "{{ model_dir }}"
+
+    - name: Clone llama.cpp
+      become: true
+      become_user: "{{ app_user }}"
+      git:
+        repo: "{{ llama_cpp_repo }}"
+        dest: "{{ llama_cpp_dir }}"
+        version: master
+        update: yes
+
+    - name: Configure llama.cpp
+      become: true
+      become_user: "{{ app_user }}"
+      command: cmake -S . -B build -DGGML_CUDA=ON
+      args:
+        chdir: "{{ llama_cpp_dir }}"
+        creates: "{{ llama_cpp_dir }}/build/CMakeCache.txt"
+
+    - name: Build llama-server
+      become: true
+      become_user: "{{ app_user }}"
+      command: cmake --build build --config Release -j {{ ansible_processor_vcpus | default(8) }}
+      args:
+        chdir: "{{ llama_cpp_dir }}"
+        creates: "{{ llama_cpp_dir }}/build/bin/llama-server"
+
+    - name: Create Python venv
+      become: true
+      become_user: "{{ app_user }}"
+      command: python3 -m venv {{ llm_venv_dir }}
+      args:
+        creates: "{{ llm_venv_dir }}/bin/activate"
+
+    - name: Install Python packages
+      become: true
+      become_user: "{{ app_user }}"
+      pip:
+        name:
+          - huggingface_hub
+          - httpx
+          - typer
+          - rich
+          - tqdm
+        virtualenv: "{{ llm_venv_dir }}"
+        state: present
+
+    - name: Install hardware profile
+      copy:
+        src: "{{ profile_src }}"
+        dest: "{{ profile_dest }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: "0644"
+
+    - name: Install start script
+      copy:
+        src: "{{ playbook_dir }}/../scripts/start-server.sh"
+        dest: "{{ start_script_dest }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: "0755"
+
+    - name: Install systemd service
+      template:
+        src: "{{ playbook_dir }}/templates/llama-server.service.j2"
+        dest: "/etc/systemd/system/{{ service_name }}.service"
+        mode: "0644"
+
+    - name: Reload systemd
+      systemd:
+        daemon_reload: true
+
+    - name: Enable service
+      systemd:
+        name: "{{ service_name }}"
+        enabled: true
+
+    - name: Show next step
+      debug:
+        msg: "Provisioning done. Put your GGUF model into {{ model_dir }} and then run: sudo systemctl start {{ service_name }}"
