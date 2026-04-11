@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export MODEL="${MODEL:-/home/plaximo/unsloth/Qwen3.5-35B-A3B-GGUF/UD-Q4_K_XL/Qwen3.5-35B-A3B-UD-Q4_K_XL-00001-of-00002.gguf}"
+export MODEL="${MODEL:-/home/plaximo/unsloth/Qwen3.5-35B-A3B-GGUF/Qwen3.5-35B-A3B-Q4_K_M.gguf}"
 export HOST="${HOST:-0.0.0.0}"
 export PORT="${PORT:-8080}"
 export CONTEXT_SIZE="${CONTEXT_SIZE:-16384}"

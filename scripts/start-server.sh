@@ -28,10 +28,9 @@ ARGS=(
   -t "$THREADS" --threads-batch "$BATCH_THREADS"
   -b "$BATCH_SIZE" -ub "$UBATCH_SIZE" --parallel "$PARALLEL"
   --cache-type-k "$CACHE_K" --cache-type-v "$CACHE_V"
-  --log-format json
 )
 
-[[ "${FLASH_ATTN}" == "1" ]] && ARGS+=(--flash-attn)
+[[ "${FLASH_ATTN}" == "1" ]] && ARGS+=(--flash-attn on)
 [[ "${MLOCK}"      == "1" ]] && ARGS+=(--mlock)
 [[ "${JINJA}"      == "1" ]] && ARGS+=(--jinja)
 
