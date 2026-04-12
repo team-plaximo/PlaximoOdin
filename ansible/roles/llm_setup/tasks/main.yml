@@ -1,44 +1,101 @@
 ---
-# LLM Setup Role
-- name: Setup LLM environment
-  block:
-    - name: Create LLM directories
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        owner: plaximo
-        group: plaximo
-        mode: '0755'
-      loop:
-        - "{{ ansible_env.HOME }}/llm-venv"
-        - "{{ ansible_env.HOME }}/llama.cpp"
-        - "{{ ansible_env.HOME }}/unsloth"
+# Role: llm_setup
+# Baut llama.cpp mit CUDA, erstellt Python-venv,
+# laedt das Modell herunter und deployt das Start-Skript.
 
-    - name: Install Python packages in venv
-      ansible.builtin.pip:
-        name:
-          - huggingface_hub
-          - httpx
-          - typer
-          - rich
-          - tqdm
-        virtualenv: "{{ ansible_env.HOME }}/llm-venv"
-        state: present
+- name: Verzeichnisse im Home anlegen
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: plaximo
+    group: plaximo
+    mode: '0755'
+  loop:
+    - "{{ ansible_env.HOME }}/llama.cpp"
+    - "{{ ansible_env.HOME }}/llm-venv"
+    - "{{ ansible_env.HOME }}/unsloth/Qwen3.5-35B-A3B-GGUF"
 
-    - name: Clone llama.cpp if not exists
-      ansible.builtin.git:
-        repo: https://github.com/ggerganov/llama.cpp.git
-        dest: "{{ ansible_env.HOME }}/llama.cpp"
-        update: yes
-        force: no
+- name: llama.cpp clonen (ggml-org)
+  ansible.builtin.git:
+    repo: https://github.com/ggml-org/llama.cpp
+    dest: "{{ ansible_env.HOME }}/llama.cpp"
+    update: yes
+    force: no
 
-    - name: Build llama.cpp
-      ansible.builtin.shell: |
-        cd {{ ansible_env.HOME }}/llama.cpp
-        mkdir -p build
-        cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release
-        make -j$(nproc)
-      creates: "{{ ansible_env.HOME }}/llama.cpp/build/bin/llama-cli"
-      become: yes
-      become_user: plaximo
+- name: llama.cpp konfigurieren (CUDA aktiviert)
+  ansible.builtin.command:
+    cmd: >
+      cmake llama.cpp -B llama.cpp/build
+      -DBUILD_SHARED_LIBS=OFF
+      -DGGML_CUDA=ON
+    chdir: "{{ ansible_env.HOME }}"
+    creates: "{{ ansible_env.HOME }}/llama.cpp/build/CMakeCache.txt"
+
+- name: llama.cpp bauen (llama-cli, llama-server, llama-gguf-split, llama-mtmd-cli)
+  ansible.builtin.command:
+    cmd: >
+      cmake --build llama.cpp/build
+      --config Release
+      -j
+      --clean-first
+      --target llama-cli llama-mtmd-cli llama-server llama-gguf-split
+    chdir: "{{ ansible_env.HOME }}"
+    creates: "{{ ansible_env.HOME }}/llama.cpp/build/bin/llama-server"
+
+- name: Binaries ins llama.cpp-Root kopieren
+  ansible.builtin.shell: cp llama.cpp/build/bin/llama-* llama.cpp/
+  args:
+    chdir: "{{ ansible_env.HOME }}"
+  changed_when: false
+
+- name: Python venv erstellen
+  ansible.builtin.command:
+    cmd: python3 -m venv {{ ansible_env.HOME }}/llm-venv
+    creates: "{{ ansible_env.HOME }}/llm-venv/bin/activate"
+
+- name: Python-Pakete in venv installieren
+  ansible.builtin.pip:
+    name:
+      - huggingface_hub
+      - httpx
+      - typer
+      - rich
+      - tqdm
+      - PyYAML
+    virtualenv: "{{ ansible_env.HOME }}/llm-venv"
+    state: present
+
+- name: Modell herunterladen (Qwen3.5-35B-A3B UD-Q4_K_XL)
+  ansible.builtin.command:
+    cmd: >
+      {{ ansible_env.HOME }}/llm-venv/bin/hf download
+      unsloth/Qwen3.5-35B-A3B-GGUF
+      --local-dir {{ ansible_env.HOME }}/unsloth/Qwen3.5-35B-A3B-GGUF
+      --include "*UD-Q4_K_XL*"
+    creates: "{{ ansible_env.HOME }}/unsloth/Qwen3.5-35B-A3B-GGUF"
+  # Hinweis: Download ~21 GB – kann 10-30 Min dauern je nach Verbindung
+
+- name: Start-Skript deployen
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../scripts/start-server.sh"
+    dest: "{{ ansible_env.HOME }}/PlaximoOdin/scripts/start-server.sh"
+    owner: plaximo
+    group: plaximo
+    mode: '0755'
+
+- name: Hardware-Profil deployen
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../config/profiles/rtx-4070-laptop.sh"
+    dest: "{{ ansible_env.HOME }}/.config/plaximo-odin/profile.sh"
+    owner: plaximo
+    group: plaximo
+    mode: '0644'
+  notify: config dir sicherstellen
+
+- name: .config/plaximo-odin Verzeichnis sicherstellen
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/plaximo-odin"
+    state: directory
+    owner: plaximo
+    group: plaximo
+    mode: '0755'

@@ -1,0 +1,15 @@
+---
+# PlaximoOdin – Master Provisioning Playbook
+# Usage: cd ~/PlaximoOdin/ansible && ansible-playbook playbooks/site.yml
+#
+# Reihenfolge:
+#   1. system  – Pakete, NVIDIA-Treiber, CUDA, GRUB, SSH, prime-select
+#   2. llm_setup – llama.cpp bauen, Python-venv, Modell herunterladen, Skript deployen
+
+- name: PlaximoOdin Full Provisioning
+  hosts: localhost
+  connection: local
+
+  roles:
+    - role: system
+    - role: llm_setup

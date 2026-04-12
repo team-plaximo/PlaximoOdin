@@ -1,0 +1,94 @@
+---
+# Role: system
+# Installiert alle System-Abhaengigkeiten:
+# Pakete, NVIDIA-Treiber, CUDA, GRUB-Patch, prime-select, SSH
+
+- name: apt cache aktualisieren
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  become: yes
+
+- name: System-Pakete installieren
+  ansible.builtin.apt:
+    name:
+      - pciutils
+      - build-essential
+      - cmake
+      - curl
+      - libcurl4-openssl-dev
+      - git
+      - python3
+      - python3-venv
+      - python3-pip
+      - openssh-server
+      - tmux
+      - htop
+      - vim
+      - wget
+    state: present
+  become: yes
+
+- name: NVIDIA Treiber + prime installieren
+  ansible.builtin.apt:
+    name:
+      - nvidia-driver-575
+      - nvidia-prime
+    state: present
+  become: yes
+  register: nvidia_installed
+
+- name: CUDA Toolkit installieren
+  ansible.builtin.apt:
+    name:
+      - nvidia-cuda-toolkit
+    state: present
+  become: yes
+
+- name: GPU-Modus auf on-demand setzen
+  ansible.builtin.command: prime-select on-demand
+  become: yes
+  changed_when: false
+
+- name: GRUB – nouveau deaktivieren, amdgpu display fix
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT='
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="quiet splash nouveau.modeset=0 amdgpu.sgdisplay=0"'
+    backup: yes
+  become: yes
+  register: grub_changed
+
+- name: GRUB_TIMEOUT auf 5 setzen
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub
+    regexp: '^GRUB_TIMEOUT='
+    line: 'GRUB_TIMEOUT=5'
+  become: yes
+
+- name: update-grub ausfuehren (wenn GRUB geaendert)
+  ansible.builtin.command: update-grub
+  become: yes
+  when: grub_changed.changed
+
+- name: SSH-Server aktivieren und starten
+  ansible.builtin.systemd:
+    name: ssh
+    enabled: yes
+    state: started
+  become: yes
+
+- name: vm.swappiness auf 10 setzen
+  ansible.posix.sysctl:
+    name: vm.swappiness
+    value: '10'
+    state: present
+    reload: yes
+  become: yes
+
+- name: Reboot-Hinweis wenn NVIDIA neu installiert
+  ansible.builtin.debug:
+    msg: >
+      NVIDIA Treiber wurde installiert oder geaendert.
+      Bitte nach dem Playbook-Ende neu starten: sudo reboot
+  when: nvidia_installed.changed
