@@ -4,6 +4,11 @@
   connection: local
   gather_facts: yes
   tasks:
+    - name: Create facts directory
+      file:
+        path: /home/plaximo/.ansible/facts
+        state: directory
+
     - name: Save OS facts
       copy:
         content: |
@@ -14,11 +19,6 @@
           Python: {{ ansible_facts['python_version'] }}
         dest: /home/plaximo/.ansible/facts/system_info.txt
         mode: '0644'
-
-    - name: Create facts directory
-      file:
-        path: /home/plaximo/.ansible/facts
-        state: directory
 
     - name: Save all facts to JSON
       copy:

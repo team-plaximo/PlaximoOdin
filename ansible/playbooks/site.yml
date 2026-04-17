@@ -13,3 +13,4 @@
   roles:
     - role: system
     - role: llm_setup
+    - role: docker_setup

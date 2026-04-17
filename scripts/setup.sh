@@ -83,12 +83,12 @@ echo ""
 echo "🔨 Setup llama.cpp..."
 if [ ! -d "$HOME/llama.cpp" ]; then
     echo "Clone llama.cpp Repository..."
-    git clone https://github.com/ggerganov/llama.cpp.git $HOME/llama.cpp
+    git clone https://github.com/ggml-org/llama.cpp.git $HOME/llama.cpp
 fi
 
 cd $HOME/llama.cpp
 mkdir -p build && cd build
-cmake ..
+  cmake .. -DGGML_CUDA=ON
 make -j$(nproc)
 echo -e "${GREEN}✓ llama.cpp kompiliert${NC}"
 cd ~

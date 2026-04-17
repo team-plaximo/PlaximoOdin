@@ -72,13 +72,21 @@
       unsloth/Qwen3.5-35B-A3B-GGUF
       --local-dir {{ ansible_env.HOME }}/unsloth/Qwen3.5-35B-A3B-GGUF
       --include "*UD-Q4_K_XL*"
-    creates: "{{ ansible_env.HOME }}/unsloth/Qwen3.5-35B-A3B-GGUF"
+    creates: "{{ ansible_env.HOME }}/unsloth/Qwen3.5-35B-A3B-GGUF/Qwen3.5-35B-A3B-Q4_K_M.gguf"
   # Hinweis: Download ~21 GB – kann 10-30 Min dauern je nach Verbindung
 
 - name: Start-Skript deployen
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/../../scripts/start-server.sh"
     dest: "{{ ansible_env.HOME }}/PlaximoOdin/scripts/start-server.sh"
+    owner: plaximo
+    group: plaximo
+    mode: '0755'
+
+- name: .config/plaximo-odin Verzeichnis sicherstellen
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/plaximo-odin"
+    state: directory
     owner: plaximo
     group: plaximo
     mode: '0755'
@@ -90,12 +98,3 @@
     owner: plaximo
     group: plaximo
     mode: '0644'
-  notify: config dir sicherstellen
-
-- name: .config/plaximo-odin Verzeichnis sicherstellen
-  ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.config/plaximo-odin"
-    state: directory
-    owner: plaximo
-    group: plaximo
-    mode: '0755'
