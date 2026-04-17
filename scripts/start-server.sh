@@ -25,17 +25,23 @@ case "$PROFILE" in
     ;;
 
   qwen35_35b_toolcall)
-    echo "Starting llama-server with Qwen3.5-35B-A3B (TOOL-CALL FIXED)..."
+    echo "Starting llama-server with Qwen3.5-35B-A3B (CLAUDE CODE OPTIMIZED)..."
     ~/llama.cpp/build/bin/llama-server \
       -m /home/plaximo/unsloth/Qwen3.5-35B-A3B-GGUF/Qwen3.5-35B-A3B-Q4_K_M.gguf \
-      -c 8192 \
-      -ngl 8 \
-      -t 8 \
-      --batch-size 256 \
-      --ubatch-size 128 \
+      -c 32768 \
+      -ngl 99 \
+      --n-cpu-moe 36 \
+      -t 10 \
+      --threads-batch 12 \
+      -b 16384 \
+      -ub 2048 \
+      --parallel 2 \
+      --cache-type-k q4_0 \
+      --cache-type-v q4_0 \
       --flash-attn on \
       --jinja \
-      --chat-template /home/plaximo/llama.cpp/build/bin/chat_template.fixed.jinja \
+      --chat-template-file /home/plaximo/PlaximoOdin/config/qwen35_fixed.jinja \
+      --chat-template-kwargs "{\"enable_thinking\": false}" \
       --host 0.0.0.0 \
       --port 8080
     ;;

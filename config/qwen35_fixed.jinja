@@ -1,0 +1,49 @@
+{%- if messages[0]['role'] == 'system' -%}
+    {%- set system_message = messages[0]['content'] -%}
+    {%- set messages = messages[1:] -%}
+{%- else -%}
+    {%- set system_message = "" -%}
+{%- endif -%}
+
+{{ '<|im_start|>system\n' + system_message }}
+{%- if tools -%}
+    {{ '\n\n# Tools\n\nYou may call one or more tools to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>' }}
+    {%- for tool in tools -%}
+        {{ '\n' + tool | tojson }}
+    {%- endfor -%}
+    {{ '\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{"name": " <function-name>", "arguments": <args-json-object>}\n</tool_call>' }}
+{%- endif -%}
+{{ '<|im_end|>\n' }}
+
+{%- for message in messages -%}
+    {{ '<|im_start|>' + message['role'] + '\n' }}
+    {%- if message['content'] -%}
+        {{ message['content'] }}
+    {%- endif -%}
+    {%- if message['tool_calls'] -%}
+        {%- for tool_call in message['tool_calls'] -%}
+            {%- if tool_call['function'] -%}
+                {%- set name = tool_call['function']['name'] -%}
+                {%- set arguments = tool_call['function']['arguments'] -%}
+            {%- else -%}
+                {%- set name = tool_call['name'] -%}
+                {%- set arguments = tool_call['arguments'] -%}
+            {%- endif -%}
+            {{ '\n<tool_call>\n{"name": "' + name + '", "arguments": ' }}
+            {%- if arguments is string -%}
+                {{ arguments }}
+            {%- else -%}
+                {{ arguments | tojson }}
+            {%- endif -%}
+            {{ '}\n</tool_call>' }}
+        {%- endfor -%}
+    {%- endif -%}
+    {%- if message['role'] == 'tool' -%}
+        {{ '<|im_start|>user\n<tool_response>\n' + message['content'] + '\n</tool_response>' }}
+    {%- endif -%}
+    {{ '<|im_end|>\n' }}
+{%- endfor -%}
+
+{%- if add_generation_prompt -%}
+    {{ '<|im_start|>assistant\n' }}
+{%- endif -%}
