@@ -28,15 +28,14 @@ case "$PROFILE" in
     echo "Starting llama-server with Qwen3.5-35B-A3B (TOOL-CALL FIXED)..."
     ~/llama.cpp/build/bin/llama-server \
       -m /home/plaximo/unsloth/Qwen3.5-35B-A3B-GGUF/Qwen3.5-35B-A3B-Q4_K_M.gguf \
-      -c 16384 \
-      -ngl 28 \
+      -c 8192 \
+      -ngl 8 \
       -t 8 \
-      --batch-size 512 \
-      --ubatch-size 256 \
-      --flash-attn \
+      --batch-size 256 \
+      --ubatch-size 128 \
+      --flash-attn on \
       --jinja \
-      --chat-template-file /home/plaximo/llama.cpp/build/bin/chat_template.fixed.jinja \
-      --tool-call-parser qwen3_xml \
+      --chat-template /home/plaximo/llama.cpp/build/bin/chat_template.fixed.jinja \
       --host 0.0.0.0 \
       --port 8080
     ;;
