@@ -1,199 +1,86 @@
-# PlaximoOdin
+# PlaximoOdin 🦅
 
-> Lokales LLM-System mit vollständiger Hardware-Integration und Open-Source-Toolchain
+> Lokales LLM-System mit vollständiger Hardware-Integration und Open-Source-Toolchain, optimiert für agentisches Coding mit Antigravity.
 
-## System-Übersicht
+## 🚀 Production Status
 
-| Komponente | Details |
-|------------|---------|
-| **OS** | Ubuntu 24.04.4 LTS (Noble Numbat) |
-| **Kernel** | 6.17.0-20-generic (PREEMPT_DYNAMIC) |
-| **Hostname** | plaximo-Victus |
-| **Benutzer** | plaximo |
+| Komponente | Status | Details |
+|------------|--------|---------|
+| **Modell** | ✅ | Qwen3.6-35B-A3B-GGUF (20GB, 65k+ context) |
+| **Server** | ✅ | llama-server (Antigravity Optimized) |
+| **Claude Code** | ✅ | Voll integriert (claude-local) |
+| **Tool Calling** | ✅ | bash_exec, ls/du, etc. (Jinja optimized) |
+| **Jinja Template**| ✅ | preserve_thinking support |
+| **GPU/CUDA** | ✅ | RTX 4070 Laptop (8GB VRAM) |
+| **Autostart** | ⏳ | Systemd Autostart (In Arbeit) |
 
-## Hardware
+## 🛠️ Quick Start (Neuinstallation)
 
-### CPU
-- **Model:** AMD Ryzen 7 7840HS w/ Radeon 780M Graphics
-- **Kerne:** 16 (8P + 8E)
-- **Threads:** 16
-
-### GPU
-- **Model:** NVIDIA GeForce RTX 4070 Mobile (Laptop)
-- **VRAM:** 8 GB
-- **Driver:** 580.126.09
-- **CUDA Version:** 13.0
-- **Aktueller VRAM-Verbrauch:** ~4.7 GB (llama-server)
-
-### Speicher
-- **RAM:** 30 GB
-- **Aktuell genutzt:** ~10 GB
-- **Swap:** 8 GB
-
-### Storage
-- **System:** NVMe SSD 953.9 GB
-- **Root-Partition:** 80 GB (46 GB belegt, 62%)
-
-## Software-Stack
-
-### LLM-Infrastruktur
-
-| Tool | Version | Zweck |
-|------|---------|-------|
-| **llama.cpp** | latest (git) | Lokale Inferenz-Engine |
-| **llama-cli** | b3079 | Kommandozeilen-Inferenz |
-| **llama-server** | b3079 | REST API Server |
-| **huggingface_hub** | 1.10.1 | Modell-Download |
-| **httpx** | 0.28.1 | Async HTTP |
-
-### Build-Toolchain
-
-| Komponente | Version |
-|------------|---------|
-| **CUDA Toolkit** | 12.0 |
-| **NVIDIA Driver** | 580 |
-| **GCC/G++** | System |
-| **CMake** | Im Build-Verzeichnis |
-
-### Python-Umgebungen
-
-| Environment | Location | Packages |
-|-------------|----------|----------|
-| **llm-venv** | `~/llm-venv/` | huggingface_hub, httpx, typer, rich, tqdm |
-
-## Verzeichnis-Struktur
-
-```
-~/
-├── llama.cpp/              # llama.cpp Repository (Source + Build)
-│   ├── build/              # Kompilierte Binaries
-│   │   └── bin/
-│   │       ├── llama-cli           # CLI Inferenz
-│   │       ├── llama-server        # HTTP Server
-│   │       └── llama-gguf-split    # Model Splitting
-│   ├── models/             # Vocab-Dateien
-│   └── examples/           # Beispiel-Code
-│
-├── llm-venv/               # Python Virtual Environment
-│   └── bin/
-│       ├── huggingface-cli
-│       └── hf
-│
-├── unsloth/                # Unsloth (Qwen3.5-35B-A3B)
-│   └── Qwen3.5-35B-A3B-GGUF/
-│
-├── .config/
-│   └── opencode/           # OpenCode AI Config
-│
-└── .cache/
-    └── huggingface/        # HuggingFace Model Cache (22 MB)
-```
-
-## Installation & Setup
-
-### llama.cpp Build
+Um das System auf einem neuen Rechner mit NVIDIA-GPU (Linux) zu installieren:
 
 ```bash
-cd ~/llama.cpp
-mkdir build && cd build
-cmake ..
-make -j$(nproc)
+# 1. Repository klonen & Scripts initialisieren
+git clone https://github.com/team-plaximo/PlaximoOdin.git
+cd PlaximoOdin
+chmod +x scripts/*.sh
+
+# 2. Abhängigkeiten installieren & Build
+./scripts/setup.sh
+
+# 3. Server mit Default-Profil starten
+./scripts/start-server.sh qwen36_35b_antigravity
+
+# 4. Claude Code verbinden
+export ANTHROPIC_BASE_URL="http://localhost:8080"
+export ANTHROPIC_API_KEY="sk-no-key-required"
+claude
 ```
 
-### Modelle herunterladen
+## 📋 Verfügbare Profile
+
+Das System unterstützt verschiedene Profile für unterschiedliche Hardware-Anforderungen:
+
+| Profil | Modell | Optimierung | Status |
+|--------|--------|-------------|--------|
+| **`qwen36_35b_antigravity`** | Qwen3.6-35B | **DEFAULT** / Antigravity Thinking | ✅ Aktiv |
+| `qwen35_35b_toolcall` | Qwen3.5-35B | Claude Code Optimized | ✅ Stabil |
+| `qwen35_35b_safe` | Qwen3.5-35B | Konservativ (8GB VRAM) | ✅ Stabil |
+| `qwen35_9b` | Qwen3.5-9B | Beste Stabilität / Performance | ✅ Aktiv |
+
+## 🧠 Qwen3.6 Migration & Optimierung
+
+Die Migration auf Qwen 3.6 brachte signifikante Verbesserungen für agentische Workflows:
+
+- **Jinja Templates:** Speziell angepasstes Template in `config/qwen36_antigravity.jinja` ermöglicht natives Tool-Calling und "Preserve Thinking" (wobei der Gedankengang des Modells für Claude Code sichtbar bleibt).
+- **Claude Code Integration:** Perfekt konfiguriert für das neue `claude-local` Interface. Die `settings.json` in `~/.claude/` verwendet das explizite GGUF-Modell.
+- **Context Handling:** Context-Window auf 65k+ erweitert, optimiert durch KV-Cache Quantisierung (q4_0).
+
+## ⚙️ Konfiguration
+
+- **Profile:** `/home/plaximo/.config/plaximo-odin/profile.sh` ([Dokumentation](docs/profile-reference.md))
+- **Claude Settings:** `/home/plaximo/.claude/settings.json` ([Dokumentation](docs/claude-config.md))
+- **Jinja Template:** `config/qwen36_antigravity.jinja`
+
+## 📊 System-Metriken
+
+### Hardware
+- **CPU:** AMD Ryzen 7 7840HS (16 Kerne)
+- **GPU:** NVIDIA RTX 4070 Mobile (8 GB VRAM)
+- **RAM:** 32 GB DDR5
+
+### Performance
+- **Prompt Processing (PP):** ~12.5 T/s (65k context)
+- **Generation (TG):** ~3.2 T/s (MoE 35B)
+
+## 🧪 Test Suite
+
+Führe das Test-Skript aus, um die Integrität des Systems zu prüfen:
 
 ```bash
-# Via HuggingFace CLI
-source ~/llm-venv/bin/activate
-huggingface-cli download <model_id>
-
-# Direkt mit llama-cli
-./llama-cli -hf <model_id>
-```
-
-### Server starten
-
-```bash
-cd ~/llama.cpp
-./build/bin/llama-server \
-  -m pfad/zu/model.gguf \
-  -c 4096 \
-  -ngl 99 \
-  --host 0.0.0.0 \
-  --port 8080
-```
-
-## Konfiguration
-
-### Environment Variables
-
-```bash
-# In ~/.bashrc
-export PATH=$HOME/.opencode/bin:$PATH
-```
-
-### Aliases
-
-```bash
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-```
-
-## Aktive Services
-
-- **llama-server** - Läuft mit ~4.7 GB VRAM auf GPU 0
-- **GNOME Session** - Vollständige Desktop-Umgebung
-
-## Installation Scripts
-
-Siehe `/scripts/` für automatisierte Setup-Skripte.
-
-## Maintenance
-
-### Updates
-
-```bash
-# Ubuntu
-sudo apt update && sudo apt upgrade
-
-# llama.cpp
-cd ~/llama.cpp && git pull && cd build && cmake .. && make -j$(nproc)
-
-# Python packages
-source ~/llm-venv/bin/activate && pip install -U package
-```
-
-### Monitoring
-
-```bash
-# GPU Status
-nvidia-smi
-
-# Speicher
-free -h
-
-# llama-server Logs
-# Via http://localhost:8080
-```
-
-## Troubleshooting
-
-### CUDA nicht gefunden
-```bash
-export CUDA_PATH=/usr/local/cuda
-export PATH=$CUDA_PATH/bin:$PATH
-```
-
-### Modell zu groß für VRAM
-```bash
-# Mit weniger GPU-Layer
-./llama-server -m model.gguf -ngl 33
-
-# Oder CPU-only
-./llama-server -m model.gguf -ngl 0
+./scripts/test-suite.sh
 ```
 
 ---
 
-*Last updated: 2026-04-10*
+*Letzter Stand: 2026-04-22 | Qwen3.6 Production ready ✅*
+

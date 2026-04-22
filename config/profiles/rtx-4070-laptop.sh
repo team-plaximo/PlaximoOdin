@@ -4,7 +4,8 @@
 # Strategie: Dense-Layer auf GPU (ngl=99), MoE-Experts auf CPU (n-cpu-moe=36)
 # Kontext:  2 parallele Slots x 131.072 Token = 262.144 Token total
 
-export MODEL="${MODEL:-/home/plaximo/unsloth/Qwen3.5-35B-A3B-GGUF/Qwen3.5-35B-A3B-Q4_K_M.gguf}"
+export MODEL="${MODEL:-/home/plaximo/unsloth/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-Q4_K_M.gguf}"
+export PRESERVE_THINKING="${PRESERVE_THINKING:-false}"
 export HOST="${HOST:-0.0.0.0}"
 export PORT="${PORT:-8080}"
 export CONTEXT_SIZE="${CONTEXT_SIZE:-262144}"

@@ -24,8 +24,26 @@ watch -n 1 nvidia-smi
 cat PlaximoOdin/config/system-info.json
 ```
 
+### Server stoppen
+```bash
+./scripts/stop-server.sh
+```
+
+### Prozess-Status prüfen
+```bash
+# Über Port 8080
+lsof -i :8080
+
+# Über Prozessname
+ps aux | grep llama-server
+
+# Über PID-File
+cat ~/.config/plaximo-odin/server.pid
+```
+
 ## Files
 - `docs/architecture.md` - Detaillierte Architektur
 - `scripts/setup.sh` - Automatisiertes Setup
 - `scripts/start-server.sh` - Server Starter
+- `scripts/stop-server.sh` - Server Stopper
 - `config/system-info.json` - System Snapshot
