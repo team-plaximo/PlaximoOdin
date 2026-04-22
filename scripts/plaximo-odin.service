@@ -1,0 +1,18 @@
+[Unit]
+Description=PlaximoOdin LLM Server (Qwen 3.6 Antigravity)
+After=network.target nvidia-persistenced.service
+Wants=nvidia-persistenced.service
+
+[Service]
+Type=simple
+User=plaximo
+Group=plaximo
+WorkingDirectory=/home/plaximo/PlaximoOdin
+ExecStart=/bin/bash /home/plaximo/PlaximoOdin/scripts/start-server.sh qwen36_35b_antigravity
+Restart=always
+RestartSec=10
+StandardOutput=append:/home/plaximo/PlaximoOdin/server_output.log
+StandardError=append:/home/plaximo/PlaximoOdin/server_output.log
+
+[Install]
+WantedBy=multi-user.target
