@@ -5,7 +5,7 @@ Diese Dokumentation beschreibt, wie du deine exakt gleiche Claude Code Konfigura
 ## 1. Voraussetzungen
 
 * **Node.js**: Installiere die aktuelle LTS Version von [nodejs.org](https://nodejs.org/).
-* **Modell-Server**: Da du den Llama-Server lokal auf Windows betreibst, stelle sicher, dass er auf Port `8080` erreichbar ist (oder passe die `ANTHROPIC_BASE_URL` an).
+* **Modell-Server**: Da der Llama-Server auf deinem **Victus** (`192.168.10.2`) läuft, muss dein Windows-Rechner diesen über das Netzwerk erreichen.
 
 ## 2. Claude Code Installation
 
@@ -32,7 +32,9 @@ Speichere dies unter `%USERPROFILE%\.claude\settings.json`:
   "env": {
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-    "CLAUDE_CODE_ATTRIBUTION_HEADER": "0"
+    "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
+    "ANTHROPIC_BASE_URL": "http://192.168.10.2:8080",
+    "ANTHROPIC_API_KEY": "sk-no-key-required"
   },
   "attribution": {
     "commit": "",
@@ -71,7 +73,7 @@ Damit Claude Code weiß, dass er nicht die Anthropic Cloud, sondern deinen lokal
 Führe diesen Befehl einmalig in der PowerShell aus:
 
 ```powershell
-[System.Environment]::SetEnvironmentVariable("ANTHROPIC_BASE_URL", "http://localhost:8080", "User")
+[System.Environment]::SetEnvironmentVariable("ANTHROPIC_BASE_URL", "http://192.168.10.2:8080", "User")
 [System.Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "sk-no-key-required", "User")
 [System.Environment]::SetEnvironmentVariable("ANTHROPIC_MODEL", "Qwen3.6-35B-A3B-Q4_K_M.gguf", "User")
 ```

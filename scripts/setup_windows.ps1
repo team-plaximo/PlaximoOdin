@@ -8,11 +8,11 @@ if (!(Test-Path $ClaudeDir)) {
 }
 
 # 1. Environment Variables setzen
-Write-Host "Setze Umgebungsvariablen für lokalen LLM Server..." -ForegroundColor Yellow
-[System.Environment]::SetEnvironmentVariable("ANTHROPIC_BASE_URL", "http://localhost:8080", "User")
+Write-Host "Setze Umgebungsvariablen für Victus LLM Server (192.168.10.2)..." -ForegroundColor Yellow
+[System.Environment]::SetEnvironmentVariable("ANTHROPIC_BASE_URL", "http://192.168.10.2:8080", "User")
 [System.Environment]::SetEnvironmentVariable("ANTHROPIC_API_KEY", "sk-no-key-required", "User")
 [System.Environment]::SetEnvironmentVariable("ANTHROPIC_MODEL", "Qwen3.6-35B-A3B-Q4_K_M.gguf", "User")
-$env:ANTHROPIC_BASE_URL = "http://localhost:8080"
+$env:ANTHROPIC_BASE_URL = "http://192.168.10.2:8080"
 $env:ANTHROPIC_API_KEY = "sk-no-key-required"
 $env:ANTHROPIC_MODEL = "Qwen3.6-35B-A3B-Q4_K_M.gguf"
 
@@ -23,6 +23,8 @@ $settings = @{
         CLAUDE_CODE_ENABLE_TELEMETRY = "0"
         CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1"
         CLAUDE_CODE_ATTRIBUTION_HEADER = "0"
+        ANTHROPIC_BASE_URL = "http://192.168.10.2:8080"
+        ANTHROPIC_API_KEY = "sk-no-key-required"
     }
     attribution = @{
         commit = ""
